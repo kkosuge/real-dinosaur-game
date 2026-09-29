@@ -2,7 +2,7 @@
 
 A photorealistic remake of Chrome's offline Dinosaur Game (T-Rex Runner) that runs in any modern browser.
 
-Play it at **https://real-dinosaur-game.kksg.net/**
+**Live demo: [https://real-dinosaur-game.kksg.net/](https://real-dinosaur-game.kksg.net/)**
 
 ![Real Dinosaur Game](docs/screenshots/hero.png)
 
@@ -155,47 +155,3 @@ Example: `index.html?seed=7&bot=1&sim=44500&freeze=1` (a pterodactyl approaching
 - `tools/`: asset pipelines, manifest builder, tests
 - `SPEC.md`: the design contract
 - `docs/screenshots/`
-
----
-
-## Recording a video
-
-The gameplay clip for X, [`docs/video/real-dinosaur-game-x.mp4`](docs/video/real-dinosaur-game-x.mp4) (16.45 s, 1920×1080, 60 fps, H.264 High + AAC-LC 48 kHz stereo, about 14 MB), and its poster image [`docs/video/poster.jpg`](docs/video/poster.jpg) are made by the scripts in `tools/record/`. The game itself (`src/`) is not modified: headless Chrome steps a `?freeze=1` page one frame (1/60 s) at a time and captures each frame. Only the length of the night is shortened while recording (see "Night length" below). The sound effects are synthesized by the game's own `src/audio.js`, so every run produces the same video.
-
-```sh
-node tools/record/plan.js --from 1 --to 4000         # (optional) search seeds 1–4000 and night lengths, write tools/record/plan.json (~2.5 min)
-node tools/record/verify_plan.js                     # (optional) check that Chrome reproduces plan.json exactly
-FFMPEG=/path/to/ffmpeg node tools/record/record.js   # capture → sound effects → encode (~3 min)
-```
-
-- Settings: seed 704 (seed 909 for the start screen), `?hi=901` (display-only high score), `?lang=en`, and a recording-only night length of 4.8 s. All on-screen text is English ("Press Space to play" and the key help, "GAME OVER", the "Share" button; the score digits are the same in every language).
-- Structure: start screen → auto-start (0.8 s) → a 0.4 s crossfade (2.1–2.5 s) → one continuous run (`?sim=57917`, ticks 3475–4335, 861 frames). 987 frames (16.45 s) in total. The length follows the story; it is not padded to 20 s.
-- The run (video seconds):
-  - Day (from score 672): jumps a small cactus (2.8 s), ducks under a pterodactyl (3.4 s)
-  - 700 points (4.0 s): the score blinks and dusk starts right away. During dusk it jumps 3 small cacti (5.0 s) and a low pterodactyl (5.8 s)
-  - Night (6.6–8.8 s, 2.2 s of moon, stars and Milky Way): jumps a low pterodactyl (7.5 s)
-  - Dawn (from 8.8 s): jumps 3 large cacti (9.1 s) and a low pterodactyl (10.6 s), 800 points (10.8 s). Full daylight again at 11.4 s; ducks under a pterodactyl (12.1 s)
-  - The bot is switched off at tick 4213 and the dino runs into 3 large cacti in daylight (14.45 s, tick 4216, score 854)
-  - The day-theme "GAME OVER", restart icon and "Share" button (from 15.2 s) are held until 16.45 s (2.0 s after the crash)
-- Night length: in the game, night lasts 12 s from the 700-point trigger (`NIGHT_DURATION` = 12000 ms, including the 2.6 s dusk fade), followed by a 2.6 s dawn. A night starting at 4.0 s would not end until 18.6 s, so the GAME OVER would be at night. To show the night in a short clip and still end in daylight, the recorder sets the page's `RDG.config.NIGHT_DURATION` to 4800 ms (after the `?sim=` fast-forward and before the first step; the value is `main.nightDurationMs` in `plan.json`). The night is purely visual and does not affect obstacles, the bot or the RNG, so the run itself is unchanged. The game keeps its 12 s night. The capture also checks every frame's night phase (`nightPhase`) against the Node replay, that it is full daylight from 1.5 s before the crash to the end, and that the share button uses the day theme (this recording has 2.2 s of full night and 3.0 s of daylight before the crash).
-- How the story is found: by default (`--story early --lang en`), `plan.js` searches seeds and night lengths for runs where the 700 milestone (the start of dusk) lands at 3.6–4.4 s of video time (counting the start screen; change with `--night-on-at A,B`), a pterodactyl is crossed in full night, there is at least 1.5 s of daylight before the crash, and the planned cactus is hit in daylight. It prefers a jump or a pterodactyl in the short day part, a pterodactyl after dawn, 2.2–3.0 s of full night, and similar.
-- Poster: frame 312 of the run (7.3 s into the video): under the full moon and the Milky Way, the dino leaps as a low pterodactyl flies toward it (pinned in `CHOICES` in `record.js`).
-- Earlier cuts: `--story day --lang ja` (the second video: exactly 20.0 s, dusk at 7.6 s, seed 1330) and `--story night --lang ja` (the first video: the crash happens at night, with the full 12 s night).
-- Requirements: Node 22, Google Chrome, and an ffmpeg with libx264. On macOS the audio is encoded with AudioToolbox AAC (CBR). The working PNGs (about 1.5 GB) go to `$RDG_VIDEO_WORK` (a temp folder if unset).
-
-`record.js` runs three scripts:
-- `capture.js`
-  - Serves the game with a throwaway `python3 -m http.server` on a random port from 9100 to 9999, and drives headless Chrome over CDP.
-  - Each frame is one `__rdg.step(1000 / 60)` and one `Page.captureScreenshot`.
-  - For a plan with `main.nightDurationMs`, sets the page's `RDG.config.NIGHT_DURATION` to it after the load and before the first step (recording only).
-  - Every frame's state hash and night phase are checked against the Node replay of the plan, and the GAME OVER must be in daylight. If Chrome does not reproduce the plan, the next planned candidate is tried.
-  - The page's UI language must be the plan's (`lang`), and the share button must read the plan's `ui.share` ("Share") on every frame it shows.
-  - The share button's CSS fade-in is replayed from the sim clock by recording-only CSS, so no wall-clock timing leaks into the frames.
-- `audio.js` renders the game's own `RDG.Audio` on an `OfflineAudioContext`, at the recorded jump, landing, 100-point and crash events.
-- `encode.js` builds the crossfade and writes the file:
-  - BT.709 yuv420p video at CRF 18
-  - AAC-LC audio at 48 kHz stereo, 160 kbit/s, raised evenly so its peak is -1 dBFS (the game's own mix peaks near -8 dBFS)
-  - `+faststart`
-  - then probes the result and checks it: exactly the plan's frame count and length (whatever the story needs; no fixed 20 s), H.264 High / AAC-LC, size, bitrate, faststart, and X's 0.5-140 s limit
-
-Options: `--candidate N`, `--hold MS` (default: the plan's exact length; for an older plan 1700 after the share button appears), `--poster-frame N`.
