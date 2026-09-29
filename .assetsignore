@@ -1,0 +1,17 @@
+# Not served: repo metadata, tooling, docs and asset sources (the game only needs
+# index.html, style.css, sw.js, src/ and the game-ready files under assets/)
+.git
+.gitignore
+.assetsignore
+.claude
+.wrangler
+node_modules
+wrangler.jsonc
+mise.toml
+README.md
+SPEC.md
+reference
+docs
+tools
+assets/raw
+assets/previews

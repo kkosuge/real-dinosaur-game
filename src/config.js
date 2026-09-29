@@ -8,7 +8,7 @@
   var K = 2.2;
 
   RDG.config = {
-    VERSION: '1.4.1', // keep in step with sw.js (rdg-v1.4.1)
+    VERSION: '1.4.2', // keep in step with sw.js (rdg-v1.4.2)
     H: H,
     K: K,
     ASPECT_MIN: 1.5,
@@ -35,7 +35,7 @@
     // The URL the GAME OVER share button posts. '' = this page's address (origin + path, never the query / hash) when
     // it is a public http(s) host; nothing for file:, localhost, *.local and private / LAN addresses. Set it to the
     // game's public address to always link there (e.g. 'https://example.com/real-dinosaur-game/').
-    SHARE_URL: '',
+    SHARE_URL: 'https://real-dinosaur-game.kksg.net/',
 
     // ---- asset loader ----
     // images still pending once this passes without any image arriving get placeholders (swapped for the real ones

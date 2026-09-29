@@ -8,7 +8,7 @@
  * VERSION only needs a bump when this file's logic or CORE changes (not for new images). */
 'use strict';
 
-var VERSION = 'rdg-v1.4.1';
+var VERSION = 'rdg-v1.4.2';
 var CORE = [
   './',
   'index.html',

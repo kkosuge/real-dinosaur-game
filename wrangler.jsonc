@@ -1,0 +1,13 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  // Static site: the game is plain files (no build step), served by Workers Static Assets.
+  // Files not needed at runtime (raw/preview images, tools, docs) are excluded in .assetsignore.
+  "name": "real-dinosaur-game",
+  "compatibility_date": "2026-09-29",
+  "assets": {
+    "directory": "."
+  },
+  "routes": [
+    { "pattern": "real-dinosaur-game.kksg.net", "custom_domain": true }
+  ]
+}
