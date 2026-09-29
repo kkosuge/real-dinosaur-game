@@ -1,156 +1,17 @@
 # Real Dinosaur Game
 
-Chrome のオフライン画面に出てくる「Dinosaur Game（T-Rex Runner）」を、実写風アセットで作り直したブラウザゲームです。
-A photorealistic remake of Chrome's offline T-Rex Runner that runs in any modern browser.
+A photorealistic remake of Chrome's offline Dinosaur Game (T-Rex Runner) that runs in any modern browser.
+
+Play it at **https://real-dinosaur-game.kksg.net/**
 
 ![Real Dinosaur Game](docs/screenshots/hero.png)
 
 | | | |
 | --- | --- | --- |
-| ![プテラノドン / pterodactyl](docs/screenshots/ptero.png) | ![夕暮れ / dusk](docs/screenshots/dusk.png) | ![夜 / night](docs/screenshots/night.png) |
-| ![しゃがみ / duck](docs/screenshots/duck.png) | ![ゲームオーバー / game over](docs/screenshots/gameover.png) | ![デバッグ表示 / debug overlay](docs/screenshots/debug.png) |
+| ![pterodactyl](docs/screenshots/ptero.png) | ![dusk](docs/screenshots/dusk.png) | ![night](docs/screenshots/night.png) |
+| ![duck](docs/screenshots/duck.png) | ![game over](docs/screenshots/gameover.png) | ![debug overlay](docs/screenshots/debug.png) |
 
----
-
-## 日本語
-
-### 遊び方
-- 走り続ける T-rex でサボテンとプテラノドンをよけ、できるだけ遠くまで進みます。スコアは走った距離です。
-- 速度は少しずつ上がります。一定の速さを超えるとプテラノドンが 3 つの高さで飛んできます。
-  - 低い: ジャンプでよける
-  - 中くらい: しゃがむかジャンプでよける
-  - 高い: 立ったままくぐれる
-- 走っている恐竜は、足で地面を蹴るたびに後ろへ砂ぼこりを立てます（着地やクラッシュのときにも舞い上がります）。
-- 100 点ごとにスコアが点滅して効果音が鳴ります。700 点ごとに夕暮れを経て夜（月と星空）になり、しばらくすると夜が明けます。
-- ハイスコアはブラウザに保存されます。Chrome と同じく、スコアは走り始めてから表示され、HI はハイスコアがあるときだけ表示されます。
-- OS の「視差効果を減らす」（prefers-reduced-motion）がオンのときは、画面の揺れ、案内文の明滅、星のまたたきを止めます。
-
-### 操作
-| 操作 | キーボード | タッチ / マウス |
-| --- | --- | --- |
-| スタート / ジャンプ | Space・↑・W | 画面のどこでもタップ / クリック |
-| 大ジャンプ / 小ジャンプ | 長押しで高く跳び、約 70〜110 ms で離すと低く跳びます。Chrome と同じく、それより短いタップでも長く押しても大ジャンプになります | 同左 |
-| しゃがむ（地上） | ↓・S | 画面の左下（左半分の下 1/3）を長押し（プレイ中） |
-| 急降下（空中） | ↓・S | 画面の左下をタップ（プレイ中） |
-| リスタート | Space・↑・Enter（ゲームオーバーの 0.75 秒後から） | 画面のどこでもタップ（同じく 0.75 秒後から） |
-| ミュート切替 | M | 左上のスピーカーボタン（スタート画面・一時停止中・ゲームオーバー画面） |
-| 一時停止 | P・Esc（もう一度押すと再開。タブ切替やウィンドウが非アクティブになったときも自動で止まります） | — |
-| デバッグ表示 | Shift + D | — |
-| シェア | Tab でシェアボタンへ移動して Space・Enter（メニューは ↑↓ で選んで Enter、Esc で閉じる） | GAME OVER 画面のシェアボタン |
-
-着地の 100 ms 前までに押したジャンプは、着地と同時に実行されます（着地前にキーを離しても大ジャンプになります）。キーを押しっぱなしにしても（オートリピート）連続ジャンプはしません。
-タッチでは、画面の左下（左半分の下 1/3）だけがしゃがみ / 急降下で、それ以外はどこをタップしてもジャンプです。右手の親指はいつでもジャンプになり、地面の近くをタップしてもしゃがんでしまうことはありません。左下の範囲は、スタート画面、一時停止中、最初のプレイの始めの数秒、そしてまだタッチでしゃがんだことがなければゲームオーバー画面に、点線の枠で表示します。
-左下でのしゃがみと急降下はプレイ中だけです。スタート画面とゲームオーバー画面では、左下をタップしてもほかの場所と同じようにスタート / リスタートします。キーボードの ↓・S ではスタートもリスタートもしません（Chrome と同じ）。
-スピーカーボタンはタッチ操作の端末だけに表示し、プレイ中は出しません（左上の角をタップしてもジャンプが消えないようにするため）。
-
-### 表示言語
-- ブラウザの言語設定（`navigator.languages`）を上から見て、最初に出てくる日本語（`ja`・`ja-JP` など）か英語（`en`・`en-US` など）で表示します。どちらもないとき（例: フランス語だけ）は英語です。例: `fr, ja` なら日本語、`en-GB, ja` なら英語。
-- 切り替わるもの: ページのタイトル（「リアル恐竜ゲーム」/「Real Dinosaur Game」）、ページの説明文、画面の案内文や一時停止などの表示、スクリーンリーダーの読み上げ、シェアボタンとシェアの文章。
-- ゲームの途中でブラウザの言語設定を変えても、すぐに切り替わります。
-- URL に `?lang=ja` / `?lang=en` を付けると、その言語に固定します（ブラウザの設定より優先）。
-
-### スコアをシェア
-GAME OVER 画面で、リスタートできるようになると（0.75 秒後）リスタートアイコンの近くに「シェア」ボタンが出ます。ボタンを押してもリスタートはしません。プレイ中・スタート画面・一時停止中は出ません。
-- パソコンでは、ボタンを押すとシェア先のメニューが開きます。
-  - X でポスト / Bluesky でポスト / LINE で送る: 投稿画面を新しいタブで開きます
-  - Facebook でシェア: 公開 URL があるときだけ表示します（Facebook は URL しか共有できないため）
-  - テキストをコピー: 投稿文をクリップボードにコピーして「コピーしました」と表示します
-  - 画像を保存: GAME OVER 画面を PNG で保存します（`index.html` を直接開いたとき（file://）はブラウザの制限で画像を読み出せないので出ません）
-  - その他…: OS の共有シート（メール、メッセージ、AirDrop など）を開きます。共有機能（Web Share API）に対応したブラウザ（macOS の Safari・Chrome、Windows の Edge・Chrome など）だけに表示します
-- スマートフォンやタブレット（タッチ操作の端末）では、ボタンを押すと OS の共有シートが開きます（インストールしている X や LINE などのアプリを選べます）。対応していれば GAME OVER 画面のスクリーンショット（`real-dinosaur-game-score.png`）も添付します。共有シートを閉じただけのときは何もしません。共有シートがない端末や、共有に失敗したときは上のメニューが開きます。
-- 添付・保存する画像では、スコアを遊ぶ範囲の右上に置き、「ゲームオーバー」の文字とリスタートアイコンをスコアに重ならない位置に描きます（縦長のスマートフォンでは、画面の表示よりも少し下になります）。
-- 投稿文の例: 「リアル恐竜ゲームで 123 点を記録！🦖 #RealDinosaurGame」。ハイスコアを更新したときは「記録！」のあとに「自己ベスト更新！」が入ります（初めてのプレイは除く）。英語では "I scored 123 in Real Dinosaur Game! 🦖 #RealDinosaurGame"（更新時は " New personal best!" が入ります）。
-- URL: `src/config.js` の `SHARE_URL` を設定するとその URL を付けます。空（既定）のときは、公開サーバー（http / https）で開いているページのアドレスを付けます。テスト用のパラメータ（`?` 以降）や `#` 以降は付けません。file://、localhost、127.0.0.1、`*.local`、社内 LAN のアドレス（10.x、172.16〜31.x、192.168.x、169.254.x など）のときは URL を付けません（友だちが開けないため）。
-- キーボード: Tab でボタンに移動して Space か Enter。メニューは ↑↓・Home・End で選び、Enter で決定、Esc で閉じます。ボタンにフォーカスがあるときの Space・Enter はシェアになるので、リスタートしたいときは Esc（フォーカスをゲームに戻す）か画面のクリックです。
-
-### 起動方法
-- `index.html` をダブルクリックして開くだけで動きます（file:// 対応、ビルド不要、外部ライブラリなし）。
-- ローカルサーバーで開くこともできます。この場合はオフラインキャッシュ（Service Worker）も有効になり、2 回目以降はネットワークなしで起動します。画像は内容のハッシュ（`tools/build_manifest.py` が付ける `?v=`）でキャッシュされるので、画像を差し替えても次の読み込みで新しい画像になります。
-  ```sh
-  python3 -m http.server 8000
-  # http://localhost:8000/ を開く
-  ```
-- どんな形の画面でも、恐竜の前方が Chrome と同じくらい（約 1350 ワールド単位）見えるように描画します。反応できる時間が画面の形で変わらないようにするためです。幅の狭いスマートフォンでは、恐竜が約 44 CSS px より小さくならない範囲で見える距離を短くします。
-  - 縦長の画面では、上に空（45%）、下に地面（55%）を広げて画面全体を埋めます。GAME OVER や案内の表示は遊ぶ範囲に付いたままです。スコアも同じですが、上に広げた空が 60 ワールド単位より高いとき（縦長のスマートフォンや 4:3 のタブレット）は、空の途中に浮かないように画面の上端（ノッチなどのセーフエリアの下）に固定します。
-  - 3.2:1 より横長の画面だけ左右に帯が付きます。帯は地平線の高さで空の色と地面の色に分かれます。
-- 画像は、空・地面・山・恐竜を先に、障害物・小石・雲を次に、夕暮れと夜の空と月を最後に読み込みます。5 秒（`LOAD_TIMEOUT_MS`）のあいだ 1 枚も届かないとき、または回線が遅くて読み込み開始から 15 秒（`LOAD_TIMEOUT_MAX_MS`）たったときは、残りを代わりの図形にしてゲームを始め、画像が届いたらその場で差し替えます。
-
-### URL パラメータ（テスト・デバッグ用）
-| パラメータ | 内容 |
-| --- | --- |
-| `seed=N` | 乱数シードを固定します（障害物の並びが毎回同じになります） |
-| `bot=1` | オートパイロット（先読み探索で自動プレイ） |
-| `sim=MS` | 最初の描画の前に、ゲーム内時間で MS ミリ秒ぶん早送りします（`bot=1` と組み合わせて使います） |
-| `freeze=1` | 最初の 1 フレームを描いたらループを止めます（スクリーンショット用） |
-| `state=idle` / `state=gameover` | 状態を強制します |
-| `night=1` / `dusk=1` | 夜 / 夕暮れの照明を強制します |
-| `debug=1` | 当たり判定、地面のライン、fps、速度を表示します |
-| `lang=ja` / `lang=en` | 表示言語を固定します（既定はブラウザの言語設定。上の「表示言語」を参照） |
-| `hi=N` | ハイスコア表示を N にします（表示だけで保存はしません。スクリーンショット用） |
-| `touch=1` | タッチ端末向けの表示にします（案内文、しゃがみ範囲の枠、スピーカーボタン。スクリーンショット用） |
-| `share=1` | `freeze=1` や `bot=1` のページでも GAME OVER のシェアボタンを表示します（ふだんはスクリーンショットに写らないように出しません） |
-
-テスト用のパラメータ（`state`・`sim`・`bot`・`freeze`・`hi`）を 1 つでも付けたときは、ハイスコアを表示しますが localStorage には保存しません。
-
-例: `index.html?seed=7&bot=1&sim=44500&freeze=1`（プテラノドンが飛んでくる場面）。
-`window.__rdg` から `sim`・`state`・`step(ms)`・`config`・`metrics` などを参照できます。
-
-スクリーンショットの撮り方（`docs/screenshots/` の画像はこの方法で作りました）:
-```sh
-"/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" --headless=new --hide-scrollbars \
-  --window-size=1600,632 --screenshot=out.png \
-  "file://$PWD/index.html?seed=3&bot=1&sim=25983&freeze=1&hi=812"
-```
-
-### テスト
-```sh
-node tools/sim_test.js
-```
-実際のアセットの当たり判定を使って、次の項目を確かめます。失敗すると 0 以外で終了します。
-- 決定性（同じシードなら同じ展開になること）と、NaN が出ないこと
-- 24 シードで bot が最高速度まで 4 分間生き残ること
-- 障害物の間隔と連続出現のルール
-- プテラノドンの出現速度と 3 つの高さ（翼の先が地面や恐竜の頭にめり込まないこと）
-- スコア、ハイスコア、100 点ごとの点滅（ゲームオーバーの瞬間は必ず本当のスコアを表示）、700 点ごとの夜
-- ジャンプ（短いタップでも大ジャンプ、着地前の先行入力、空中でぶつかったときにサボテンの上で止まること）
-- タッチ入力（指ごとの長押しの管理、左下のしゃがみ範囲、スピーカーボタンを押してもジャンプしないこと）と、一時停止をはさんで押し続けた ↓ キーがしゃがみに戻ること
-- シェアボタンなどの画面上の UI への操作がゲームの入力にならないこと（クリック、タップ、Space・Enter、メニューを閉じたタップ）
-- 表示言語の決め方（`navigator.languages`、`?lang=`、言語設定の変更）、日英の文字列がそろっていること、シェアの文章、URL を付けるかどうかの判定、各 SNS の URL のエンコード
-- シェアボタンを押したときに開くもの（タッチ端末は OS の共有シート、パソコンはメニュー）と、Shift などの修飾キーだけでは一時停止が解除されないこと
-- シェア用の画像で「ゲームオーバー」の文字がスコアに重ならないこと（縦長のスマートフォンなど 16 通りの画面サイズ）
-
-### アセットの作り方
-- 画像はすべて **Codex の画像生成** で作りました。ゲームで使う画像のために全部で 58 回生成しています（恐竜 16 と画像編集 2、サボテン 12、プテラノドン 3、空 11、地形 14）。
-  - 生成したままの画像は `assets/raw/` にあります（使わなかった候補も記録として残しています）。
-  - ゲームで使う画像は `assets/dino/`・`assets/obstacles/`・`assets/scenery/` にあり、合計は約 1.2 MB（WebP）です。
-  - 走るときの砂ぼこりは、砂ぼこりのスプライト（`assets/fx/`、`tools/assets/fx.py`、生成 10 回、約 0.3 MB）で描きます。Service Worker はこれらも先読みします。
-- 生成のときは、毎回見本画像 `reference/screen.webp` を添付しました。さらに、先に作った画像も添付して「同じ個体」「同じ山並み」として描かせることで、見た目をそろえています。
-  - 恐竜の走りの 4 コマは 1 枚のシートとしてまとめて生成しました。そのうち 1 コマ（`run_1`）は、手前の脚と奥の脚が交互に上がるように、あとから Codex の画像編集で描き直しました。
-  - プテラノドンの羽ばたき 3 コマも 1 枚の画像として生成しました。
-  - 背景はすべて透過（transparent background）で生成したので、クロマキー処理はしていません。
-- 加工は再現可能なスクリプト `tools/assets/<group>.py`（dino / cactus / ptero / sky / terrain）で行います。スクリプトは次の処理をして、マニフェストの断片 `assets/manifest/<group>.json` を書き出します。
-  - アルファのクリーンアップ
-  - 見本写真に合わせた色調整
-  - コマ同士の位置合わせ
-  - 縮小と WebP 書き出し
-  - アルファマスクから当たり判定を計算
-  ```sh
-  python3 -m venv .venv && .venv/bin/pip install -r tools/requirements.txt
-  .venv/bin/python tools/assets/dino.py      # 他のグループも同様
-  python3 tools/build_manifest.py            # assets/manifest/*.json -> assets/manifest.js
-  ```
-- 作り直すときは、新しい生成画像を `assets/raw/` に置き、該当する `tools/assets/<group>.py` を実行してから `tools/build_manifest.py` を実行します。エンジンは次の値をマニフェストから自動で計算します。
-  - 当たり判定と大きさ
-  - プテラノドンの高度
-  - 障害物の並びの公平性
-- 画像が欠けていても、同じ当たり判定の形をした代わりの図形で遊べます。
-- `tools/build_manifest.py` は画像のパスに内容のハッシュ（`?v=`）を付けます。`--check` を付けると、画像を変えたのにマニフェストを作り直していない場合も知らせます。
-
----
-
-## English
-
-### How to play
+## How to play
 Keep the T-rex running: jump over cacti, and duck under or jump over pterodactyls. Your score is the distance run.
 - The game speeds up over time. Past a speed threshold, pterodactyls arrive at three altitudes:
   - low: jump
@@ -162,7 +23,7 @@ Keep the T-rex running: jump over cacti, and duck under or jump over pterodactyl
 - The high score is kept in your browser. As in Chrome, the score appears once you start, and HI only once you have a high score.
 - With `prefers-reduced-motion` set, there is no camera shake, hint pulse or star twinkle.
 
-### Controls
+## Controls
 | Action | Keyboard | Touch / mouse |
 | --- | --- | --- |
 | Start / jump | Space, ↑, W | tap anywhere / click |
@@ -180,13 +41,13 @@ On a touch screen only the bottom-left (the bottom third of the left half) ducks
 The bottom-left duck and fast-fall only apply during a run: on the start screen and on GAME OVER a tap there starts or restarts like a tap anywhere else. ↓ and S never start or restart (as in Chrome).
 The speaker button appears on touch screens only, and never during a run (a tap in that corner must stay a jump).
 
-### Language
+## Language
 - The UI is in Japanese or English: the first Japanese (`ja`, `ja-JP`, …) or English (`en`, `en-US`, …) entry in the browser's language list (`navigator.languages`) wins, and English is the fallback (e.g. French only). `fr, ja` gives Japanese; `en-GB, ja` gives English.
 - This covers the page title ("Real Dinosaur Game" / 「リアル恐竜ゲーム」), the page description, the on-screen hints and pause text, the screen-reader label and announcements, and the share button and text.
 - Changing the browser's language preferences switches the page live.
 - `?lang=ja` / `?lang=en` pins a language over the browser's.
 
-### Share your score
+## Share your score
 On GAME OVER, once a restart is possible (after 0.75 s), a Share button appears near the restart icon. Pressing it never restarts the game. It is never shown during a run, on the start screen or while paused.
 - On a computer, the button opens a small menu:
   - Post on X / Post on Bluesky / Share on LINE: opens the post composer in a new tab
@@ -200,18 +61,19 @@ On GAME OVER, once a restart is possible (after 0.75 s), a Share button appears 
 - The URL: `SHARE_URL` in `src/config.js` when set. Otherwise the page's own address when it is served from a public http(s) host, without its query string (the test hooks) or hash. From `file://`, localhost, 127.0.0.1, `*.local` or a private LAN address (10.x, 172.16–31.x, 192.168.x, 169.254.x, …) no URL is added, since nobody else could open it.
 - Keyboard: Tab to the button, then Space or Enter. In the menu, ↑ ↓ Home End move, Enter picks, Esc closes. While the button has focus, Space and Enter share instead of restarting: press Esc (hands the keyboard back to the game) or click the game to restart.
 
-### Run it
+## Run it
 - Double-click `index.html`. It works from `file://`, with no build step and no external libraries.
 - Or serve the folder. This also enables the offline service worker, so later visits load without a network. Images are cached by content hash (the `?v=` that `tools/build_manifest.py` appends), so a changed image shows up on the next load:
   ```sh
   python3 -m http.server 8000   # then open http://localhost:8000/
   ```
+- Deploy: `wrangler deploy` publishes the folder as a Cloudflare Workers static-assets site on the custom domain in `wrangler.jsonc`. `.assetsignore` keeps the raw images, previews, tools and docs out of the upload.
 - Any window shape shows at least Chrome's view ahead of the dino (about 1350 world units), so your reaction time does not depend on the window shape. On narrow phones the view is shortened just enough to keep the dino at least about 44 CSS px tall.
   - On taller screens the scene extends to fill the screen: extra sky above (45%) and more ground below (55%). GAME OVER and the hints stay with the playfield. So does the score, unless the extra sky is taller than 60 world units (portrait phones, 4:3 tablets): then it pins to the top of the screen, below any notch / safe-area inset, instead of floating mid-sky.
   - Only screens wider than 3.2:1 get side bands, which split into sky and ground colours at the horizon.
 - Images load in priority order: the sky, ground, mountains and dino first, then the obstacles, decor and clouds, and the dusk / night skies and moon last. When no image has arrived for 5 s (`LOAD_TIMEOUT_MS`), or 15 s after loading started on a slow but moving connection (`LOAD_TIMEOUT_MAX_MS`), the rest get placeholders so the game can start, and each is swapped in as soon as it loads.
 
-### URL parameters (testing / debugging)
+## URL parameters (testing / debugging)
 | Parameter | Effect |
 | --- | --- |
 | `seed=N` | Deterministic run (the same obstacle sequence every time) |
@@ -232,7 +94,7 @@ Example: `index.html?seed=7&bot=1&sim=44500&freeze=1` (a pterodactyl approaching
 `{ sim, state, step(ms), config, metrics, ... }`. The images in `docs/screenshots/` were made with headless Chrome:
 `--headless=new --window-size=1600,632 --screenshot=out.png "file://…/index.html?seed=3&bot=1&sim=25983&freeze=1&hi=812"`.
 
-### Tests
+## Tests
 `node tools/sim_test.js` runs against the real asset hitboxes and exits non-zero on failure. It checks:
 - determinism and the absence of NaNs
 - bot survival up to MAX speed for 4 minutes on 24 seeds
@@ -246,7 +108,7 @@ Example: `index.html?seed=7&bot=1&sim=44500&freeze=1` (a pterodactyl approaching
 - what the Share button opens (the OS share sheet on touch screens, the menu on computers), and that a modifier key such as Shift alone never resumes a pause
 - that GAME OVER never overlaps the score in the share image (16 screen sizes, tall phones included)
 
-### How the assets were made
+## How the assets were made
 - Every image was generated with **Codex image generation**: 58 generations for the game's images (dino 16 plus 2 image edits, cacti 12, pterodactyl 3, sky 11, terrain 14).
   - The untouched outputs are in `assets/raw/`, including rejected candidates, kept for provenance.
   - The game-ready WebPs in `assets/dino/`, `assets/obstacles/` and `assets/scenery/` total about 1.2 MB.
@@ -276,7 +138,7 @@ Example: `index.html?seed=7&bot=1&sim=44500&freeze=1` (a pterodactyl approaching
 - If an image is missing, the engine falls back to a placeholder with the same hitbox shape.
 - `tools/build_manifest.py` adds a content hash (`?v=`) to every image path; `--check` also reports images that changed without a rebuild.
 
-### Layout
+## Layout
 - `index.html`, `style.css`
 - `src/`
   - `config.js`: gameplay and loader tunables (the renderer keeps its own)
@@ -296,31 +158,30 @@ Example: `index.html?seed=7&bot=1&sim=44500&freeze=1` (a pterodactyl approaching
 
 ---
 
-## 動画の作り方 / Recording a video
+## Recording a video
 
-X に投稿するプレイ動画 [`docs/video/real-dinosaur-game-x.mp4`](docs/video/real-dinosaur-game-x.mp4)（16.45 秒、1920×1080、60 fps、H.264 High + AAC-LC 48 kHz ステレオ、約 14 MB）と、ポスター画像 [`docs/video/poster.jpg`](docs/video/poster.jpg) は `tools/record/` のスクリプトで作りました。ゲーム本体（`src/`）は変えずに、ヘッドレス Chrome で `?freeze=1` のページを 1 フレーム（1/60 秒）ずつ進めて撮影します（夜の長さだけは撮影時に短くします。下の「夜の長さ」を参照）。効果音はゲームの `src/audio.js` で合成するので、何度実行しても同じ動画になります。
+The gameplay clip for X, [`docs/video/real-dinosaur-game-x.mp4`](docs/video/real-dinosaur-game-x.mp4) (16.45 s, 1920×1080, 60 fps, H.264 High + AAC-LC 48 kHz stereo, about 14 MB), and its poster image [`docs/video/poster.jpg`](docs/video/poster.jpg) are made by the scripts in `tools/record/`. The game itself (`src/`) is not modified: headless Chrome steps a `?freeze=1` page one frame (1/60 s) at a time and captures each frame. Only the length of the night is shortened while recording (see "Night length" below). The sound effects are synthesized by the game's own `src/audio.js`, so every run produces the same video.
 
 ```sh
-node tools/record/plan.js --from 1 --to 4000         # (任意) シード 1〜4000 と夜の長さから展開を探して tools/record/plan.json を書く（約 2.5 分）
-node tools/record/verify_plan.js                     # (任意) plan.json が Chrome でも同じ展開になるか確かめる
-FFMPEG=/path/to/ffmpeg node tools/record/record.js   # 撮影 → 効果音 → エンコード（約 3 分）
+node tools/record/plan.js --from 1 --to 4000         # (optional) search seeds 1–4000 and night lengths, write tools/record/plan.json (~2.5 min)
+node tools/record/verify_plan.js                     # (optional) check that Chrome reproduces plan.json exactly
+FFMPEG=/path/to/ffmpeg node tools/record/record.js   # capture → sound effects → encode (~3 min)
 ```
 
-- 使ったもの: シード 704（スタート画面はシード 909）、`?hi=901`（ハイスコアの表示だけ）、`?lang=en`、撮影時だけの夜の長さ 4.8 秒。画面の文字はすべて英語です（「Press Space to play」と操作説明、「GAME OVER」、「Share」ボタン。スコアの数字は言語によらず同じ）。
-- 流れ: スタート画面 → 自動スタート（0.8 秒）→ 0.4 秒のクロスフェード（2.1〜2.5 秒）→ 1 回のプレイ（`?sim=57917`、tick 3475〜4335、861 フレーム）。全体で 987 フレーム（16.45 秒）。長さは展開しだいで、20 秒にそろえる水増しはしません。
-- 1 回のプレイの中身（動画の秒数）:
-  - 昼（スコア 672 から）: 小さなサボテンを跳び（2.8 秒）、プテラノドンをしゃがんでかわす（3.4 秒）
-  - 700 点（4.0 秒）: スコアが点滅し、すぐに夕暮れが始まる。夕暮れのうちに小さなサボテン 3 本（5.0 秒）と低く飛ぶプテラノドン（5.8 秒）を跳ぶ
-  - 夜（6.6〜8.8 秒の 2.2 秒間、月・星・天の川）: 低く飛ぶプテラノドンを跳び越える（7.5 秒）
-  - 夜明け（8.8 秒〜）: 大きなサボテン 3 本（9.1 秒）と低く飛ぶプテラノドン（10.6 秒）を跳び、800 点（10.8 秒）。11.4 秒には昼に戻り、プテラノドンをしゃがんでかわす（12.1 秒）
-  - tick 4213 で bot を止め、昼のまま大きなサボテン 3 本に衝突する（14.45 秒、tick 4216、854 点）
-  - 昼の配色の「GAME OVER」、リスタートアイコンと「Share」ボタン（15.2 秒〜）を 16.45 秒まで映す（衝突から 2.0 秒）
-- 夜の長さ: ゲームでは 700 点から 12 秒（`NIGHT_DURATION` = 12000 ms、うち 2.6 秒が夕暮れ）夜が続き、2.6 秒かけて明けます。そのままだと 4.0 秒に始まった夜は 18.6 秒まで明けず、ゲームオーバーが夜になります。短い動画で夜も見せつつゲームオーバーを昼にするため、撮影時だけページの `RDG.config.NIGHT_DURATION` を 4800 ms にします（`?sim=` の早送りのあと、最初のフレームを進める前。値は `plan.json` の `main.nightDurationMs`）。夜は見た目だけの演出で、障害物・bot・乱数には影響しないので、プレイの中身は変わりません。ゲーム本体の夜は 12 秒のままです。撮影では毎フレームの夜の濃さ（`nightPhase`）も Node の再現と照合し、衝突の 1.5 秒前から最後まで昼であること、シェアボタンが昼の配色であることを確かめます（この撮影では真夜中（夜の濃さ 1）が 2.2 秒、衝突前の昼が 3.0 秒）。
-- 展開の探し方: `plan.js` の既定（`--story early --lang en`）は、700 点（夕暮れの始まり）が動画の 3.6〜4.4 秒（スタート画面から数える。`--night-on-at A,B` で変更可）に来ること、真夜中にプテラノドンを越えること、衝突前に 1.5 秒以上の昼があること、昼のうちに狙ったサボテンに当たることを条件に、シードと夜の長さを探します。昼の短い間にジャンプかプテラノドンがあること、夜明け後のプテラノドン、2.2〜3.0 秒の真夜中などを高く評価します。
-- ポスター: 1 回のプレイの 312 フレーム目（動画の 7.3 秒）。満月と天の川の下、跳び上がった恐竜に低く飛ぶプテラノドンが向かってくる場面です（`record.js` の `CHOICES` で固定）。
-- 前の動画の展開: `--story day --lang ja`（2 本目: ちょうど 20.0 秒、夕暮れは 7.6 秒、シード 1330）、`--story night --lang ja`（最初の動画: 夜のうちに衝突する、夜は 12 秒のまま）でも探せます。
-
-- 必要なもの: Node 22、Google Chrome、libx264 入りの ffmpeg。macOS では音声を AudioToolbox の AAC（CBR）で書き出します。作業用の PNG（約 1.5 GB）は `$RDG_VIDEO_WORK`（未設定なら一時フォルダ）に置きます。
+- Settings: seed 704 (seed 909 for the start screen), `?hi=901` (display-only high score), `?lang=en`, and a recording-only night length of 4.8 s. All on-screen text is English ("Press Space to play" and the key help, "GAME OVER", the "Share" button; the score digits are the same in every language).
+- Structure: start screen → auto-start (0.8 s) → a 0.4 s crossfade (2.1–2.5 s) → one continuous run (`?sim=57917`, ticks 3475–4335, 861 frames). 987 frames (16.45 s) in total. The length follows the story; it is not padded to 20 s.
+- The run (video seconds):
+  - Day (from score 672): jumps a small cactus (2.8 s), ducks under a pterodactyl (3.4 s)
+  - 700 points (4.0 s): the score blinks and dusk starts right away. During dusk it jumps 3 small cacti (5.0 s) and a low pterodactyl (5.8 s)
+  - Night (6.6–8.8 s, 2.2 s of moon, stars and Milky Way): jumps a low pterodactyl (7.5 s)
+  - Dawn (from 8.8 s): jumps 3 large cacti (9.1 s) and a low pterodactyl (10.6 s), 800 points (10.8 s). Full daylight again at 11.4 s; ducks under a pterodactyl (12.1 s)
+  - The bot is switched off at tick 4213 and the dino runs into 3 large cacti in daylight (14.45 s, tick 4216, score 854)
+  - The day-theme "GAME OVER", restart icon and "Share" button (from 15.2 s) are held until 16.45 s (2.0 s after the crash)
+- Night length: in the game, night lasts 12 s from the 700-point trigger (`NIGHT_DURATION` = 12000 ms, including the 2.6 s dusk fade), followed by a 2.6 s dawn. A night starting at 4.0 s would not end until 18.6 s, so the GAME OVER would be at night. To show the night in a short clip and still end in daylight, the recorder sets the page's `RDG.config.NIGHT_DURATION` to 4800 ms (after the `?sim=` fast-forward and before the first step; the value is `main.nightDurationMs` in `plan.json`). The night is purely visual and does not affect obstacles, the bot or the RNG, so the run itself is unchanged. The game keeps its 12 s night. The capture also checks every frame's night phase (`nightPhase`) against the Node replay, that it is full daylight from 1.5 s before the crash to the end, and that the share button uses the day theme (this recording has 2.2 s of full night and 3.0 s of daylight before the crash).
+- How the story is found: by default (`--story early --lang en`), `plan.js` searches seeds and night lengths for runs where the 700 milestone (the start of dusk) lands at 3.6–4.4 s of video time (counting the start screen; change with `--night-on-at A,B`), a pterodactyl is crossed in full night, there is at least 1.5 s of daylight before the crash, and the planned cactus is hit in daylight. It prefers a jump or a pterodactyl in the short day part, a pterodactyl after dawn, 2.2–3.0 s of full night, and similar.
+- Poster: frame 312 of the run (7.3 s into the video): under the full moon and the Milky Way, the dino leaps as a low pterodactyl flies toward it (pinned in `CHOICES` in `record.js`).
+- Earlier cuts: `--story day --lang ja` (the second video: exactly 20.0 s, dusk at 7.6 s, seed 1330) and `--story night --lang ja` (the first video: the crash happens at night, with the full 12 s night).
+- Requirements: Node 22, Google Chrome, and an ffmpeg with libx264. On macOS the audio is encoded with AudioToolbox AAC (CBR). The working PNGs (about 1.5 GB) go to `$RDG_VIDEO_WORK` (a temp folder if unset).
 
 `record.js` runs three scripts:
 - `capture.js`
