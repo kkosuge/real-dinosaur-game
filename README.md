@@ -298,37 +298,43 @@ Example: `index.html?seed=7&bot=1&sim=44500&freeze=1` (a pterodactyl approaching
 
 ## 動画の作り方 / Recording a video
 
-X に投稿するプレイ動画 [`docs/video/real-dinosaur-game-x.mp4`](docs/video/real-dinosaur-game-x.mp4)（20.0 秒、1920×1080、60 fps、H.264 High + AAC-LC 48 kHz ステレオ、約 15 MB）と、ポスター画像 [`docs/video/poster.jpg`](docs/video/poster.jpg) は `tools/record/` のスクリプトで作りました。ゲーム本体は変えずに、ヘッドレス Chrome で `?freeze=1` のページを 1 フレーム（1/60 秒）ずつ進めて撮影します。効果音はゲームの `src/audio.js` で合成するので、何度実行しても同じ動画になります。
+X に投稿するプレイ動画 [`docs/video/real-dinosaur-game-x.mp4`](docs/video/real-dinosaur-game-x.mp4)（16.45 秒、1920×1080、60 fps、H.264 High + AAC-LC 48 kHz ステレオ、約 14 MB）と、ポスター画像 [`docs/video/poster.jpg`](docs/video/poster.jpg) は `tools/record/` のスクリプトで作りました。ゲーム本体（`src/`）は変えずに、ヘッドレス Chrome で `?freeze=1` のページを 1 フレーム（1/60 秒）ずつ進めて撮影します（夜の長さだけは撮影時に短くします。下の「夜の長さ」を参照）。効果音はゲームの `src/audio.js` で合成するので、何度実行しても同じ動画になります。
 
 ```sh
-node tools/record/plan.js                            # (任意) シード 1〜2000 から展開を探して tools/record/plan.json を書く（約 80 秒）
+node tools/record/plan.js --from 1 --to 4000         # (任意) シード 1〜4000 と夜の長さから展開を探して tools/record/plan.json を書く（約 2.5 分）
 node tools/record/verify_plan.js                     # (任意) plan.json が Chrome でも同じ展開になるか確かめる
-FFMPEG=/path/to/ffmpeg node tools/record/record.js   # 撮影 → 効果音 → エンコード（約 3.5 分）
+FFMPEG=/path/to/ffmpeg node tools/record/record.js   # 撮影 → 効果音 → エンコード（約 3 分）
 ```
 
-- 使ったもの: シード 909、`?hi=901`（ハイスコアの表示だけ）、`?lang=ja`。
-- 流れ: スタート画面（「スペースキーでスタート」）→ 自動スタート → 0.4 秒のクロスフェード → 1 回のプレイ（`?sim=54800`、tick 3288〜4361）。
-- 1 回のプレイの中身:
-  - 昼（スコア 628）: プテラノドンをしゃがんでかわし、3 本並んだサボテンを跳ぶ
-  - 700 点: スコアが点滅し、夕暮れを経て夜（月と天の川）になる
-  - 夜: 低く飛ぶプテラノドンを跳び越える
-  - tick 4206 で bot を止め、サボテンに衝突する（tick 4214、854 点）
-  - ゲームオーバーとシェアボタンが出たあと 1.7 秒止める
-- ポスター: 1 回のプレイの 794 フレーム目。
+- 使ったもの: シード 704（スタート画面はシード 909）、`?hi=901`（ハイスコアの表示だけ）、`?lang=en`、撮影時だけの夜の長さ 4.8 秒。画面の文字はすべて英語です（「Press Space to play」と操作説明、「GAME OVER」、「Share」ボタン。スコアの数字は言語によらず同じ）。
+- 流れ: スタート画面 → 自動スタート（0.8 秒）→ 0.4 秒のクロスフェード（2.1〜2.5 秒）→ 1 回のプレイ（`?sim=57917`、tick 3475〜4335、861 フレーム）。全体で 987 フレーム（16.45 秒）。長さは展開しだいで、20 秒にそろえる水増しはしません。
+- 1 回のプレイの中身（動画の秒数）:
+  - 昼（スコア 672 から）: 小さなサボテンを跳び（2.8 秒）、プテラノドンをしゃがんでかわす（3.4 秒）
+  - 700 点（4.0 秒）: スコアが点滅し、すぐに夕暮れが始まる。夕暮れのうちに小さなサボテン 3 本（5.0 秒）と低く飛ぶプテラノドン（5.8 秒）を跳ぶ
+  - 夜（6.6〜8.8 秒の 2.2 秒間、月・星・天の川）: 低く飛ぶプテラノドンを跳び越える（7.5 秒）
+  - 夜明け（8.8 秒〜）: 大きなサボテン 3 本（9.1 秒）と低く飛ぶプテラノドン（10.6 秒）を跳び、800 点（10.8 秒）。11.4 秒には昼に戻り、プテラノドンをしゃがんでかわす（12.1 秒）
+  - tick 4213 で bot を止め、昼のまま大きなサボテン 3 本に衝突する（14.45 秒、tick 4216、854 点）
+  - 昼の配色の「GAME OVER」、リスタートアイコンと「Share」ボタン（15.2 秒〜）を 16.45 秒まで映す（衝突から 2.0 秒）
+- 夜の長さ: ゲームでは 700 点から 12 秒（`NIGHT_DURATION` = 12000 ms、うち 2.6 秒が夕暮れ）夜が続き、2.6 秒かけて明けます。そのままだと 4.0 秒に始まった夜は 18.6 秒まで明けず、ゲームオーバーが夜になります。短い動画で夜も見せつつゲームオーバーを昼にするため、撮影時だけページの `RDG.config.NIGHT_DURATION` を 4800 ms にします（`?sim=` の早送りのあと、最初のフレームを進める前。値は `plan.json` の `main.nightDurationMs`）。夜は見た目だけの演出で、障害物・bot・乱数には影響しないので、プレイの中身は変わりません。ゲーム本体の夜は 12 秒のままです。撮影では毎フレームの夜の濃さ（`nightPhase`）も Node の再現と照合し、衝突の 1.5 秒前から最後まで昼であること、シェアボタンが昼の配色であることを確かめます（この撮影では真夜中（夜の濃さ 1）が 2.2 秒、衝突前の昼が 3.0 秒）。
+- 展開の探し方: `plan.js` の既定（`--story early --lang en`）は、700 点（夕暮れの始まり）が動画の 3.6〜4.4 秒（スタート画面から数える。`--night-on-at A,B` で変更可）に来ること、真夜中にプテラノドンを越えること、衝突前に 1.5 秒以上の昼があること、昼のうちに狙ったサボテンに当たることを条件に、シードと夜の長さを探します。昼の短い間にジャンプかプテラノドンがあること、夜明け後のプテラノドン、2.2〜3.0 秒の真夜中などを高く評価します。
+- ポスター: 1 回のプレイの 312 フレーム目（動画の 7.3 秒）。満月と天の川の下、跳び上がった恐竜に低く飛ぶプテラノドンが向かってくる場面です（`record.js` の `CHOICES` で固定）。
+- 前の動画の展開: `--story day --lang ja`（2 本目: ちょうど 20.0 秒、夕暮れは 7.6 秒、シード 1330）、`--story night --lang ja`（最初の動画: 夜のうちに衝突する、夜は 12 秒のまま）でも探せます。
 
-- 必要なもの: Node 22、Google Chrome、libx264 入りの ffmpeg。macOS では音声を AudioToolbox の AAC（CBR）で書き出します。作業用の PNG（約 2 GB）は `$RDG_VIDEO_WORK`（未設定なら一時フォルダ）に置きます。
+- 必要なもの: Node 22、Google Chrome、libx264 入りの ffmpeg。macOS では音声を AudioToolbox の AAC（CBR）で書き出します。作業用の PNG（約 1.5 GB）は `$RDG_VIDEO_WORK`（未設定なら一時フォルダ）に置きます。
 
 `record.js` runs three scripts:
 - `capture.js`
   - Serves the game with a throwaway `python3 -m http.server` on a random port from 9100 to 9999, and drives headless Chrome over CDP.
   - Each frame is one `__rdg.step(1000 / 60)` and one `Page.captureScreenshot`.
-  - Every frame's state hash is checked against the Node replay of the plan. If Chrome does not reproduce the plan, the next planned candidate is tried.
+  - For a plan with `main.nightDurationMs`, sets the page's `RDG.config.NIGHT_DURATION` to it after the load and before the first step (recording only).
+  - Every frame's state hash and night phase are checked against the Node replay of the plan, and the GAME OVER must be in daylight. If Chrome does not reproduce the plan, the next planned candidate is tried.
+  - The page's UI language must be the plan's (`lang`), and the share button must read the plan's `ui.share` ("Share") on every frame it shows.
   - The share button's CSS fade-in is replayed from the sim clock by recording-only CSS, so no wall-clock timing leaks into the frames.
 - `audio.js` renders the game's own `RDG.Audio` on an `OfflineAudioContext`, at the recorded jump, landing, 100-point and crash events.
 - `encode.js` builds the crossfade and writes the file:
   - BT.709 yuv420p video at CRF 18
-  - AAC-LC audio at 48 kHz stereo, 160 kbit/s
+  - AAC-LC audio at 48 kHz stereo, 160 kbit/s, raised evenly so its peak is -1 dBFS (the game's own mix peaks near -8 dBFS)
   - `+faststart`
-  - then probes the result and checks it against X's limits
+  - then probes the result and checks it: exactly the plan's frame count and length (whatever the story needs; no fixed 20 s), H.264 High / AAC-LC, size, bitrate, faststart, and X's 0.5-140 s limit
 
-Options: `--candidate N`, `--hold MS` (default 1700 after the share button appears), `--poster-frame N`.
+Options: `--candidate N`, `--hold MS` (default: the plan's exact length; for an older plan 1700 after the share button appears), `--poster-frame N`.

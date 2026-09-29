@@ -8,7 +8,8 @@
  * Video: intro PNGs, then a linear crossfade (xfade) of xfadeFrames into the main PNGs; 1920x1080, 60 fps constant,
  * RGB -> BT.709 limited-range yuv420p, H.264 High@4.2, CRF 18 (VBV-capped at 20 Mbit/s, well under X's 25),
  * 2 s GOP, tagged BT.709. Audio: DIR/audio.wav, raised evenly so its peak is --audio-peak dBFS (default -1) -> AAC-LC 48 kHz stereo 160 kbit/s (AudioToolbox CBR on macOS). +faststart (moov first) for streaming.
- * Afterwards the file is probed and checked against that spec (duration, frame count, codecs, size < 60 MB). */
+ * Afterwards the file is probed and checked against that spec (duration = the timeline's totalFrames / fps, whatever
+ * the plan's length, and within X's 0.5-140 s; frame count, codecs, size < 60 MB). */
 'use strict';
 
 var fs = require('fs');
@@ -25,6 +26,7 @@ function argv(name, def) {
 }
 
 var FFMPEG = process.env.FFMPEG || 'ffmpeg';
+var X_MIN_S = 0.5, X_MAX_S = 140; // X's video length limits (seconds, non-Premium upload)
 
 function run(args, opts) {
   var r = cp.spawnSync(FFMPEG, args, Object.assign({ encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 }, opts || {}));
@@ -112,7 +114,8 @@ function main() {
   if (!p.audio || p.audio.codec !== 'aac' || p.audio.profile !== 'LC' || p.audio.hz !== 48000 || p.audio.layout !== 'stereo') problems.push('audio stream: ' + JSON.stringify(p.audio));
   if (p.frames !== tl.totalFrames) problems.push('frames ' + p.frames + ' != ' + tl.totalFrames);
   if (!(Math.abs(p.duration - want) < 0.05)) problems.push('duration ' + p.duration + ' != ' + want);
-  if (!(p.duration >= 18 && p.duration <= 22)) problems.push('duration outside 18-22 s');
+  // the length is the plan's (the early story is ~14-17 s, the day story exactly 20 s): only X's own limits here
+  if (!(p.duration >= X_MIN_S && p.duration <= X_MAX_S)) problems.push('duration outside X\'s ' + X_MIN_S + '-' + X_MAX_S + ' s');
   if (size >= 60e6) problems.push('size ' + size);
   if (!(p.kbps < 25000)) problems.push('bitrate ' + p.kbps + ' kb/s');
   var head = Buffer.alloc(64);

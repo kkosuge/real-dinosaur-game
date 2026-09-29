@@ -16,6 +16,10 @@
  * switched off before the step that starts at botOffTick (its update() then clears the reused output object), so
  * the dino runs into the planned cactus. The main segment's state hash is checked against the Node replay of the
  * plan on every frame (a mismatch aborts: use the next --candidate).
+ * A day-story plan (main.nightDurationMs) shortens the night for the recording only: PAGE_SETUP sets the page's
+ * RDG.config.NIGHT_DURATION (the sim's cfg) after the load / ?sim= fast-forward, before the first step (the shipped
+ * game keeps 12 s). The state hash does not cover the night, so the night phase is checked on every frame as well,
+ * and the GAME OVER must be in daylight (night phase 0, share UI in the day theme).
  *
  * Output (DIR = --work, default $RDG_VIDEO_WORK or <tmp>/rdg-video):
  *   DIR/frames/intro/000000.png ..   DIR/frames/main/000000.png ..   DIR/capture.json (timeline, per-frame facts,
@@ -42,6 +46,7 @@ var EV_NAMES = ['', 'START', 'JUMP', 'LAND', 'FASTDROP', 'MILESTONE', 'CRASH', '
 /* ---- in-page recorder (serialised into the page; recording only) ------------------------------------------------ */
 var PAGE_SETUP = function (opt) {
   var S = RDG.Sim, cfg = __rdg.config, orig = S.step;
+  if (opt.nightDurationMs != null) cfg.NIGHT_DURATION = opt.nightDurationMs; // recording-only short night (sim.cfg === cfg)
   // The share button's CSS fade-in and hover transition run on the wall clock: off here, replayed from the sim below.
   var css = document.createElement('style');
   css.id = 'rdg-record-css';
@@ -68,7 +73,7 @@ var PAGE_SETUP = function (opt) {
     return 3 * (1 - t) * t * t + t * t * t;
   }
   var btn = document.getElementById('share-btn');
-  var rec = window.__rec = { botOff: -1 };
+  var rec = window.__rec = { botOff: -1, nightDuration: cfg.NIGHT_DURATION, sameCfg: __rdg.sim.cfg === cfg };
   function info() {
     var sim = __rdg.sim, d = sim.dino, op = null, rect = null, label = null, theme = null;
     if (btn && !btn.hidden) {
@@ -85,7 +90,7 @@ var PAGE_SETUP = function (opt) {
     return {
       tick: sim.tick, state: __rdg.state, hash: S.stateHash(sim), score: Math.floor(sim.score), hud: sim.flashActive,
       y: Math.round(d.y * 100) / 100, anim: d.anim, jumping: d.jumping, ducking: d.ducking,
-      night: Math.round(sim.nightPhase * 1000) / 1000, got: Math.round(sim.gameOverTime * 100) / 100,
+      night: Math.round(sim.nightPhase * 1000) / 1000, np: sim.nightPhase, got: Math.round(sim.gameOverTime * 100) / 100,
       share: op, shareRect: rect, shareLabel: label, shareTheme: theme, ev: ev,
       focus: document.activeElement ? document.activeElement.tagName : null
     };
@@ -106,14 +111,17 @@ var PAGE_SETUP = function (opt) {
 /** Node replay of the main segment (per-frame state hashes), exactly as the page is stepped. */
 function expectedMain(G, tl) {
   var m = tl.main;
-  var game = new lib.Game(G, { seed: m.seed, simMs: m.mainStartMs, hi: tl.hi });
+  var game = new lib.Game(G, { seed: m.seed, simMs: m.mainStartMs, hi: tl.hi, nightDurationMs: m.nightDurationMs });
   if (game.sim.tick !== m.startTick) throw new Error('Node: ?sim=' + m.mainStartMs + ' gives tick ' + game.sim.tick);
-  var hashes = [G.Sim.stateHash(game.sim)];
+  var hashes = [G.Sim.stateHash(game.sim)], np = [game.sim.nightPhase];
   for (var j = 1; j < m.frames; j++) {
     if (game.sim.tick === m.botOffTick) game.botOff();
     game.tick();
     hashes.push(G.Sim.stateHash(game.sim));
+    np.push(game.sim.nightPhase);
   }
+  G.cfg.NIGHT_DURATION = G.defaults.NIGHT_DURATION;
+  hashes.np = np;
   return hashes;
 }
 
@@ -143,8 +151,11 @@ async function captureSegment(s, name, url, readyExpr, opt, frames, outDir, log)
     }
   }
   await Promise.all(writes);
-  var extra = await s.eval('({ botOff: __rec.botOff, crashSerial: __rdg.sim.crashSerial, result: __rdg.result })');
-  return { page: page, frames: infos, identicalToPrevious: dup, botOff: extra.botOff, crashSerial: extra.crashSerial, result: extra.result, logs: s.logs.slice() };
+  var extra = await s.eval('({ botOff: __rec.botOff, nightDuration: __rec.nightDuration, sameCfg: __rec.sameCfg, crashSerial: __rdg.sim.crashSerial, result: __rdg.result })');
+  return {
+    page: page, frames: infos, identicalToPrevious: dup, botOff: extra.botOff, nightDuration: extra.nightDuration, sameCfg: extra.sameCfg,
+    crashSerial: extra.crashSerial, result: extra.result, logs: s.logs.slice()
+  };
 }
 
 async function main() {
@@ -177,7 +188,7 @@ async function main() {
       var m = limit ? Math.min(limit, tl.main.frames) : tl.main.frames;
       out.main = await captureSegment(s, 'main', s.url(tl.main.url),
         'window.__rdg && __rdg.renderer && __rdg.renderer.A && __rdg.sim.tick === ' + tl.main.startTick + ' && document.readyState === "complete"',
-        { botOffTick: tl.main.botOffTick }, m, path.join(work, 'frames', 'main'), log);
+        { botOffTick: tl.main.botOffTick, nightDurationMs: tl.main.nightDurationMs }, m, path.join(work, 'frames', 'main'), log);
     }
   });
 
@@ -210,6 +221,12 @@ async function main() {
     var mf = out.main.frames, bad = -1;
     for (var j = 0; j < mf.length; j++) if (mf[j].hash !== expHashes[j]) { bad = j; break; }
     if (bad >= 0) problems.push('main: state hash differs from the Node plan from frame ' + bad + ' (tick ' + mf[bad].tick + ')');
+    var npBad = -1;
+    for (var jn = 0; jn < mf.length; jn++) if (mf[jn].np !== expHashes.np[jn]) { npBad = jn; break; }
+    if (npBad >= 0) problems.push('main: night phase differs from the Node plan from frame ' + npBad + ' (' + mf[npBad].np + ' != ' + expHashes.np[npBad] + ')');
+    if (!out.main.sameCfg) problems.push('main: the page sim does not use __rdg.config');
+    var wantNight = tl.main.nightDurationMs != null ? tl.main.nightDurationMs : G.cfg.NIGHT_DURATION;
+    if (out.main.nightDuration !== wantNight) problems.push('main: NIGHT_DURATION ' + out.main.nightDuration + ' != ' + wantNight);
     if (!limit) {
       var cr = out.main.events.filter(function (e) { return e.ev === 'CRASH'; });
       if (cr.length !== 1 || cr[0].frame !== tl.main.crashFrame) problems.push('main: crash ' + JSON.stringify(cr));
@@ -219,6 +236,15 @@ async function main() {
       for (var q = 0; q < mf.length; q++) if (mf[q].share != null) { sh = q; break; }
       if (sh !== tl.main.shareFrame) problems.push('main: share button from frame ' + sh + ', expected ' + tl.main.shareFrame);
       if (!mf[mf.length - 1].share || mf[mf.length - 1].share < 1) problems.push('main: share button not fully shown at the end');
+      // the share button's label in the plan's language (plan.ui, written by plan.js) on every frame it shows
+      var badLabel = plan.ui ? mf.filter(function (x) { return x.shareLabel != null && x.shareLabel !== plan.ui.share; }) : [];
+      if (badLabel.length) problems.push('main: share button label ' + JSON.stringify(badLabel[0].shareLabel) + ' != ' + JSON.stringify(plan.ui.share) + ' on ' + badLabel.length + ' frames');
+      if (tl.main.nightDurationMs != null) { // day story: the GAME OVER in daylight
+        var cf = tl.main.crashFrame;
+        if (mf.slice(Math.max(0, cf - 90)).some(function (x) { return x.np !== 0; })) problems.push('main: night phase not 0 from 1.5 s before the crash to the end');
+        if (mf.slice(cf).some(function (x) { return x.shareTheme && x.shareTheme !== 'day'; })) problems.push('main: share UI not in the day theme');
+        if (!mf.some(function (x) { return x.np >= 1; })) problems.push('main: never full night');
+      }
     }
   }
   out.problems = problems;

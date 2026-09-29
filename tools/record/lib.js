@@ -25,7 +25,9 @@ function loadGame() {
   var RDG = ctx.RDG, cfg = RDG.config, Sim = RDG.Sim;
   var manifest = ctx.ASSET_MANIFEST || {}; // main.js: root.ASSET_MANIFEST || {}
   var metrics = Sim.buildMetrics(manifest, cfg); // main.js: Sim.buildMetrics(manifest, cfg)
-  return { RDG: RDG, Sim: Sim, Bot: RDG.Bot, cfg: cfg, manifest: manifest, metrics: metrics };
+  // the shipped values of the keys a recording may override (see Game opts.nightDurationMs)
+  var defaults = { NIGHT_DURATION: cfg.NIGHT_DURATION };
+  return { RDG: RDG, Sim: Sim, Bot: RDG.Bot, cfg: cfg, manifest: manifest, metrics: metrics, defaults: defaults };
 }
 
 /** Playfield width in world units for a viewport (render.js Renderer.prototype.resize, RC.VIEW_MIN_W / DINO_MIN_CSS_H). */
@@ -46,10 +48,16 @@ function simMsForTicks(cfg, ticks) {
  * A page-equivalent game: main.js with ?seed=seed&bot=1 (&sim=simMs when given) &freeze=1 (&hi=hi).
  * tick() = main.js tick() (bot branch); botOff(): from now on the bot presses nothing (the recorder does the same in
  * the page by replacing __rdg.bot.update with a function that clears its output).
+ * opts.nightDurationMs (recording only, the promo video's short night): after the load and the ?sim= fast-forward
+ * the recorder sets the page's RDG.config.NIGHT_DURATION (= sim.cfg, shared by the sim and the bot's clones) to this
+ * value, before it steps the first frame; this game does the same on G.cfg (reset to the shipped value first, so
+ * an earlier game's override never leaks into the fast-forward). The night cycle is visual only (sim.js: no
+ * obstacle, physics, bot or RNG code reads it) and the state hash does not include it, so compare nightPhase too.
  */
 function Game(G, opts) {
   opts = opts || {};
   var Sim = G.Sim, cfg = G.cfg;
+  if (G.defaults) cfg.NIGHT_DURATION = G.defaults.NIGHT_DURATION; // the page loads with the shipped config
   this.G = G;
   this.params = { seed: (opts.seed == null ? 1 : Number(opts.seed)) >>> 0, sim: Math.max(0, opts.simMs || 0), hi: opts.hi | 0, freeze: true };
   this.sim = Sim.create({ seed: this.params.seed, metrics: G.metrics, cfg: cfg, hiScore: Math.max(0, this.params.hi) });
@@ -64,6 +72,8 @@ function Game(G, opts) {
     Sim.start(this.sim);
     if (this.params.sim > 0) this.advance(this.params.sim);
   }
+  this.nightDurationMs = opts.nightDurationMs == null ? null : Number(opts.nightDurationMs);
+  if (this.nightDurationMs != null) cfg.NIGHT_DURATION = this.nightDurationMs; // the recorder's override, after load
 }
 Game.prototype.tick = function () {
   var Sim = this.G.Sim, sim = this.sim, STATUS = Sim.STATUS, inp = this.inp;
@@ -99,22 +109,25 @@ function shareDelayFrames(cfg) {
  *   main page (?sim=mainStartMs): main frame j shows sim.tick === startTick + j, frames 0..mainFrames-1;
  *   video frame v: v < mainOffset -> intro v; v >= introFrames -> main v - mainOffset; in between the two are
  *   crossfaded (mainOffset = introFrames - xfadeFrames).
- * The main segment ends holdMs after the frame on which the share button appears (the plan's own hold is shorter,
- * since the planner capped the segment at 17 s; the recorder may run on: the page is frozen, nothing restarts).
+ * Main segment length: a plan with exactFrames (plan.js's early and day stories) is played exactly as planned
+ * (candidate.mainFrames, so the video is exactly plan.totalFrames long); an older plan ends holdMs after the frame
+ * on which the share button appears (its own hold was shorter, since the planner capped the segment at 17 s).
+ * --hold (opts.holdMs) always overrides. The page is frozen, nothing restarts, so the recorder may run on.
+ * main.nightDurationMs: the recording-only night length to set on the main page (null: the shipped 12 s).
  */
 function timeline(plan, cfg, opts) {
   opts = opts || {};
   var ci = Number(opts.candidate || 0), c = plan.candidates[ci];
   if (!c) throw new Error('plan has no candidate #' + ci);
   var step = cfg.STEP_MS;
-  var introSeed = ci === 0 ? plan.intro.seed : c.seed;
+  var introSeed = ci === 0 || plan.intro.fixedSeed ? plan.intro.seed : c.seed;
   var q = function (seed, extra) {
     return 'index.html?seed=' + seed + '&bot=1' + extra + '&freeze=1&lang=' + plan.lang + '&hi=' + c.hi + '&share=1';
   };
   var crashFrame = c.crashTick - c.startTick;
   var shareFrame = crashFrame + shareDelayFrames(cfg);
-  var holdMs = opts.holdMs == null ? 1700 : Number(opts.holdMs);
-  var mainFrames = shareFrame + Math.round(holdMs / step);
+  var holdMs = opts.holdMs != null ? Number(opts.holdMs) : plan.exactFrames ? Math.round((c.mainFrames - shareFrame) * step) : 1700;
+  var mainFrames = opts.holdMs == null && plan.exactFrames ? c.mainFrames : shareFrame + Math.round(holdMs / step);
   var introFrames = plan.intro.frames, xfade = plan.xfadeFrames, mainOffset = introFrames - xfade;
   var total = mainOffset + mainFrames;
   return {
@@ -123,8 +136,10 @@ function timeline(plan, cfg, opts) {
     main: {
       seed: c.seed, url: q(c.seed, '&sim=' + c.mainStartMs), mainStartMs: c.mainStartMs, startTick: c.startTick,
       botOffTick: c.botOffTick, crashTick: c.crashTick, crashSerial: c.crash.serial, finalScore: c.finalScore,
+      nightDurationMs: c.nightDurationMs == null ? null : c.nightDurationMs,
       crashFrame: crashFrame, shareFrame: shareFrame, frames: mainFrames,
-      posterFrame: ci === 0 && plan.main.posterFrame != null ? plan.main.posterFrame : c.nightPtero ? Math.round(c.nightPtero.at * plan.fps) - 12 : crashFrame - 60
+      posterFrame: ci === 0 && plan.main.posterFrame != null ? plan.main.posterFrame : c.posterFrame != null ? c.posterFrame
+        : c.nightPtero ? Math.round(c.nightPtero.at * plan.fps) - 12 : crashFrame - 60
     },
     xfadeFrames: xfade, mainOffset: mainOffset, totalFrames: total, seconds: total / plan.fps, holdMs: holdMs,
     /** video frame of intro frame i / main frame j */

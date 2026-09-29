@@ -21,9 +21,16 @@ function argv(name, def) {
   return v == null || v.slice(0, 2) === '--' ? true : v;
 }
 
-// Choices made by eye on top of the plan, per main seed: the poster (a main-segment frame).
-// seed 909, main frame 794: full night, the dino airborne right above the LOW pterodactyl, moon and Milky Way behind.
-var CHOICES = { 909: { posterFrame: 794 } };
+// Choices made by eye on top of the plan, per main segment (seed@mainStartMs): the poster (a main-segment frame).
+// Without one the plan's own poster frame is used (the night pterodactyl ~0.2 s before it meets the dino).
+// 909@54800 (the first, night-ending video), main frame 794: full night, the dino airborne right above the LOW
+// pterodactyl, moon and Milky Way behind.
+// 1330@54333 (the day-GAME-OVER video), main frame 532 (video 10.97 s): full night, the dino leaving the ground
+// toward the LOW pterodactyl (wings spread, same height), full moon and Milky Way above (checked against 530-541).
+// 704@57917 (the English, early-dusk video), main frame 312 (video 7.30 s): full night, the dino airborne and the LOW
+// pterodactyl gliding in toward it (wings spread, both clear of each other), full moon and Milky Way above (checked
+// against 300-333; the plan's own pick, pinned here).
+var CHOICES = { '909@54800': { posterFrame: 794 }, '1330@54333': { posterFrame: 532 }, '704@57917': { posterFrame: 312 } };
 
 function step(script, args) {
   console.log('\n$ node tools/record/' + script + ' ' + args.join(' '));
@@ -46,7 +53,7 @@ function main() {
   if (ci < 0) { process.exitCode = 1; return; }
   if (!step('audio.js', ['--work', work])) { process.exitCode = 1; return; }
   var enc = ['--work', work];
-  var choice = CHOICES[plan.candidates[ci].seed] || {};
+  var choice = CHOICES[plan.candidates[ci].seed + '@' + plan.candidates[ci].mainStartMs] || {};
   var pf = argv('poster-frame', choice.posterFrame);
   if (pf != null) enc.push('--poster-frame', String(pf));
   if (!step('encode.js', enc)) { process.exitCode = 1; return; }
