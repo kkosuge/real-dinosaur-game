@@ -1,0 +1,243 @@
+:root {
+  --sky: #c2c4c7;
+  --ground: #9c8773;
+  --hz: 50%; /* page y of the canvas horizon (set by main.js): the bands split sky / ground there */
+  color-scheme: light;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  /* bands around the canvas continue the scene: sky above the horizon, ground below */
+  background: linear-gradient(to bottom, var(--sky) 0 var(--hz), var(--ground) var(--hz) 100%);
+  overscroll-behavior: none;
+}
+
+body {
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+#stage {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* keep the playfield clear of a landscape notch (main.js subtracts this padding from the canvas width) */
+  box-sizing: border-box;
+  padding-left: env(safe-area-inset-left, 0px);
+  padding-right: env(safe-area-inset-right, 0px);
+}
+
+#game {
+  display: block;
+  touch-action: none;
+  cursor: pointer;
+  outline: none;
+}
+
+/* visually hidden, still read by screen readers (the live status region) */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+.noscript {
+  position: fixed;
+  inset: auto 0 40%;
+  margin: 0;
+  text-align: center;
+  font: 600 18px system-ui, sans-serif;
+  color: #535353;
+}
+
+/* ---------------------------------------------------------------------------------------------------------------
+ * GAME OVER share UI (src/share.js places it: position: fixed at the renderer's share slot, so it never shifts the
+ * page). Echoes the canvas restart icon: a soft, light, frosted rounded rect with the HUD's dark grey; dark with light
+ * text from dusk on (the renderer's GAME OVER colours). More opaque than the icon: a wide button often overlaps a
+ * cactus top, which must read as a faint shadow behind a clean button, not a smear. */
+.rdg-share {
+  position: absolute; /* out of #stage's flex flow; children are fixed */
+  left: 0;
+  top: 0;
+  width: 0;
+  height: 0;
+  --share-fg: #535353;
+  --share-bg: rgba(255, 255, 255, 0.62);
+  --share-bg-hover: rgba(255, 255, 255, 0.74);
+  --share-border: rgba(83, 83, 83, 0.2);
+  --share-ring: #535353;
+  --share-halo: rgba(255, 255, 255, 0.7);
+  --menu-bg: rgba(250, 250, 248, 0.94);
+  --menu-fg: #3d3d3d;
+  --menu-hover: rgba(83, 83, 83, 0.12);
+  --menu-shadow: 0 10px 30px rgba(20, 20, 20, 0.22), 0 0 0 1px rgba(40, 40, 40, 0.08);
+}
+.rdg-share[data-theme="night"] {
+  --share-fg: #e8ebf2;
+  --share-bg: rgba(10, 14, 28, 0.56);
+  --share-bg-hover: rgba(10, 14, 28, 0.68);
+  --share-border: rgba(232, 235, 242, 0.24);
+  --share-ring: #e8ebf2;
+  --share-halo: rgba(10, 14, 28, 0.7);
+  --menu-bg: rgba(20, 25, 36, 0.94);
+  --menu-fg: #e8ebf2;
+  --menu-hover: rgba(232, 235, 242, 0.14);
+  --menu-shadow: 0 10px 30px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(232, 235, 242, 0.12);
+}
+
+.rdg-share-btn {
+  position: fixed;
+  left: 50%;
+  top: 60%;
+  z-index: 2;
+  transform: translate(-50%, -50%); /* share.js sets left / top to the slot's centre */
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.42em;
+  min-width: 44px;
+  min-height: 44px;
+  height: 48px;
+  margin: 0;
+  padding: 0 1.05em 0 0.9em;
+  border: 1px solid var(--share-border);
+  border-radius: 10px;
+  background: var(--share-bg);
+  -webkit-backdrop-filter: blur(6px) saturate(1.1);
+  backdrop-filter: blur(6px) saturate(1.1);
+  color: var(--share-fg);
+  font: 700 18px/1 system-ui, -apple-system, "Segoe UI", "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Noto Sans JP", "Yu Gothic UI", Meiryo, sans-serif;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  animation: rdg-share-in 0.22s ease-out;
+  transition: background-color 0.15s;
+}
+.rdg-share-btn[hidden],
+.rdg-share-menu[hidden],
+.rdg-share-item[hidden] {
+  display: none;
+}
+.rdg-share-btn:hover { background: var(--share-bg-hover); }
+.rdg-share-btn:active { transform: translate(-50%, -50%) scale(0.96); }
+.rdg-share-btn:focus { outline: none; }
+.rdg-share-btn:focus-visible {
+  outline: 3px solid var(--share-ring);
+  outline-offset: 3px;
+  box-shadow: 0 0 0 6px var(--share-halo); /* a halo so the ring reads on sky and sand alike */
+}
+.rdg-share-ico {
+  width: 1.2em;
+  height: 1.2em;
+  flex: none;
+  margin-top: -0.08em;
+}
+@keyframes rdg-share-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.rdg-share-menu {
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 3;
+  box-sizing: border-box;
+  min-width: 212px;
+  max-width: calc(100vw - 16px);
+  margin: 0;
+  padding: 6px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  border-radius: 14px;
+  background: var(--menu-bg);
+  -webkit-backdrop-filter: blur(14px) saturate(1.2);
+  backdrop-filter: blur(14px) saturate(1.2);
+  color: var(--menu-fg);
+  box-shadow: var(--menu-shadow);
+  font: 600 15px/1.2 system-ui, -apple-system, "Segoe UI", "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Noto Sans JP", "Yu Gothic UI", Meiryo, sans-serif;
+  animation: rdg-share-in 0.14s ease-out;
+}
+.rdg-share-item {
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  min-height: 44px;
+  margin: 0;
+  padding: 0 14px 0 12px;
+  border: 0;
+  border-radius: 9px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  white-space: nowrap;
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+.rdg-share-item svg {
+  width: 20px;
+  height: 20px;
+  flex: none;
+}
+.rdg-share-item:hover,
+.rdg-share-item:focus { background: var(--menu-hover); outline: none; }
+.rdg-share-item:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: -2px;
+}
+
+.rdg-share-toast {
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  z-index: 4;
+  margin: 0;
+  padding: 8px 14px;
+  border-radius: 999px;
+  background: rgba(38, 38, 38, 0.9);
+  color: #fff;
+  font: 600 14px/1.2 system-ui, -apple-system, "Segoe UI", "Hiragino Sans", "Noto Sans JP", sans-serif;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transform: translate(-50%, -100%);
+  transition: opacity 0.18s;
+}
+.rdg-share-toast[data-side="below"] { transform: translate(-50%, 0); }
+.rdg-share-toast.is-shown { opacity: 1; }
+.rdg-share[data-theme="night"] .rdg-share-toast { background: rgba(232, 235, 242, 0.94); color: #1b2030; }
+
+@media (prefers-reduced-motion: reduce) {
+  .rdg-share-btn,
+  .rdg-share-menu { animation: none; }
+  .rdg-share-toast,
+  .rdg-share-btn { transition: none; }
+  .rdg-share-btn:active { transform: translate(-50%, -50%); }
+}

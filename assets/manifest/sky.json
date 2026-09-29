@@ -1,0 +1,64 @@
+{
+  "sky": {
+    "clouds": [
+      {
+        "h": 305,
+        "src": "assets/scenery/cloud_1.webp",
+        "w": 896
+      },
+      {
+        "h": 197,
+        "src": "assets/scenery/cloud_2.webp",
+        "w": 957
+      },
+      {
+        "h": 325,
+        "src": "assets/scenery/cloud_3.webp",
+        "w": 758
+      },
+      {
+        "h": 258,
+        "src": "assets/scenery/cloud_4.webp",
+        "w": 818
+      },
+      {
+        "h": 319,
+        "src": "assets/scenery/cloud_5.webp",
+        "w": 878
+      }
+    ],
+    "day": {
+      "h": 1080,
+      "horizonY": 0.8,
+      "src": "assets/scenery/sky_day.webp",
+      "w": 2560
+    },
+    "dusk": {
+      "h": 1080,
+      "horizonY": 0.8,
+      "src": "assets/scenery/sky_dusk.webp",
+      "sun": {
+        "glow": [
+          247,
+          225,
+          148
+        ],
+        "r": 0.0158,
+        "x": 0.1202,
+        "y": 0.6674
+      },
+      "w": 2560
+    },
+    "moon": {
+      "h": 384,
+      "src": "assets/scenery/moon.webp",
+      "w": 384
+    },
+    "night": {
+      "h": 1080,
+      "horizonY": 0.8,
+      "src": "assets/scenery/sky_night.webp",
+      "w": 2560
+    }
+  }
+}

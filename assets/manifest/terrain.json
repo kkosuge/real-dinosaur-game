@@ -1,0 +1,105 @@
+{
+  "terrain": {
+    "decor": [
+      {
+        "h": 116,
+        "kind": "rock",
+        "src": "assets/scenery/decor_rock_1.webp",
+        "srcBlur": "assets/scenery/decor_rock_1_blur.webp",
+        "w": 201
+      },
+      {
+        "h": 101,
+        "kind": "rock",
+        "src": "assets/scenery/decor_rock_2.webp",
+        "srcBlur": "assets/scenery/decor_rock_2_blur.webp",
+        "w": 271
+      },
+      {
+        "h": 121,
+        "kind": "rock",
+        "src": "assets/scenery/decor_rock_3.webp",
+        "srcBlur": "assets/scenery/decor_rock_3_blur.webp",
+        "w": 254
+      },
+      {
+        "h": 124,
+        "kind": "rock",
+        "src": "assets/scenery/decor_rock_4.webp",
+        "srcBlur": "assets/scenery/decor_rock_4_blur.webp",
+        "w": 211
+      },
+      {
+        "h": 124,
+        "kind": "rock",
+        "src": "assets/scenery/decor_rock_5.webp",
+        "srcBlur": "assets/scenery/decor_rock_5_blur.webp",
+        "w": 230
+      },
+      {
+        "h": 119,
+        "kind": "rock",
+        "src": "assets/scenery/decor_rock_6.webp",
+        "srcBlur": "assets/scenery/decor_rock_6_blur.webp",
+        "w": 218
+      },
+      {
+        "fg": false,
+        "h": 175,
+        "kind": "grass",
+        "src": "assets/scenery/decor_grass_1.webp",
+        "srcBlur": "assets/scenery/decor_grass_1_blur.webp",
+        "w": 236
+      },
+      {
+        "h": 168,
+        "kind": "grass",
+        "src": "assets/scenery/decor_grass_2.webp",
+        "srcBlur": "assets/scenery/decor_grass_2_blur.webp",
+        "w": 219
+      },
+      {
+        "h": 201,
+        "kind": "grass",
+        "src": "assets/scenery/decor_grass_3.webp",
+        "srcBlur": "assets/scenery/decor_grass_3_blur.webp",
+        "w": 265
+      },
+      {
+        "h": 150,
+        "kind": "grass",
+        "src": "assets/scenery/decor_grass_4.webp",
+        "srcBlur": "assets/scenery/decor_grass_4_blur.webp",
+        "w": 277
+      },
+      {
+        "fg": false,
+        "h": 184,
+        "kind": "grass",
+        "src": "assets/scenery/decor_grass_5.webp",
+        "srcBlur": "assets/scenery/decor_grass_5_blur.webp",
+        "w": 253
+      },
+      {
+        "fg": false,
+        "h": 169,
+        "kind": "grass",
+        "src": "assets/scenery/decor_grass_6.webp",
+        "srcBlur": "assets/scenery/decor_grass_6_blur.webp",
+        "w": 241
+      }
+    ],
+    "ground": {
+      "h": 560,
+      "src": "assets/scenery/ground.webp",
+      "w": 4096
+    },
+    "mountains": {
+      "baselinePx": 167,
+      "h": 179,
+      "peakPx": 13,
+      "src": "assets/scenery/mountains.webp",
+      "w": 6144
+    }
+  }
+}

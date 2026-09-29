@@ -1,0 +1,216 @@
+{
+  "fx": {
+    "dust": [
+      {
+        "anchor": [
+          0.501,
+          0.91
+        ],
+        "h": 249,
+        "kind": "puff",
+        "src": "assets/fx/dust_puff_0.webp",
+        "stage": "fresh",
+        "w": 256,
+        "worldW": 46
+      },
+      {
+        "anchor": [
+          0.494,
+          0.863
+        ],
+        "h": 150,
+        "kind": "puff",
+        "src": "assets/fx/dust_puff_1.webp",
+        "stage": "fresh",
+        "w": 256,
+        "worldW": 54
+      },
+      {
+        "anchor": [
+          0.484,
+          0.912
+        ],
+        "h": 256,
+        "kind": "puff",
+        "src": "assets/fx/dust_puff_2.webp",
+        "stage": "fresh",
+        "w": 222,
+        "worldW": 40
+      },
+      {
+        "anchor": [
+          0.565,
+          0.883
+        ],
+        "h": 184,
+        "kind": "puff",
+        "src": "assets/fx/dust_puff_3.webp",
+        "stage": "fresh",
+        "w": 256,
+        "worldW": 50
+      },
+      {
+        "anchor": [
+          0.499,
+          0.886
+        ],
+        "h": 197,
+        "kind": "puff",
+        "src": "assets/fx/dust_puff_4.webp",
+        "stage": "fresh",
+        "w": 256,
+        "worldW": 50
+      },
+      {
+        "anchor": [
+          0.504,
+          0.885
+        ],
+        "h": 179,
+        "kind": "puff",
+        "src": "assets/fx/dust_puff_5.webp",
+        "stage": "fresh",
+        "w": 224,
+        "worldW": 32
+      },
+      {
+        "anchor": [
+          0.567,
+          0.819
+        ],
+        "h": 113,
+        "kind": "puff",
+        "src": "assets/fx/dust_puff_6.webp",
+        "stage": "thin",
+        "w": 256,
+        "worldW": 56
+      },
+      {
+        "anchor": [
+          0.597,
+          0.893
+        ],
+        "h": 219,
+        "kind": "puff",
+        "src": "assets/fx/dust_puff_7.webp",
+        "stage": "thin",
+        "w": 256,
+        "worldW": 48
+      },
+      {
+        "anchor": [
+          0.659,
+          0.895
+        ],
+        "h": 215,
+        "kind": "puff",
+        "src": "assets/fx/dust_puff_8.webp",
+        "stage": "thin",
+        "w": 256,
+        "worldW": 50
+      },
+      {
+        "anchor": [
+          0.567,
+          0.851
+        ],
+        "h": 158,
+        "kind": "puff",
+        "src": "assets/fx/dust_puff_9.webp",
+        "stage": "thin",
+        "w": 256,
+        "worldW": 50
+      },
+      {
+        "anchor": [
+          0.538,
+          0.759
+        ],
+        "h": 81,
+        "kind": "puff",
+        "src": "assets/fx/dust_puff_10.webp",
+        "stage": "thin",
+        "w": 256,
+        "worldW": 58
+      },
+      {
+        "anchor": [
+          0.617,
+          0.899
+        ],
+        "h": 203,
+        "kind": "puff",
+        "src": "assets/fx/dust_puff_11.webp",
+        "stage": "thin",
+        "w": 224,
+        "worldW": 36
+      },
+      {
+        "anchor": [
+          0.911,
+          0.803
+        ],
+        "h": 150,
+        "kind": "plume",
+        "src": "assets/fx/dust_plume_0.webp",
+        "w": 400,
+        "worldW": 140
+      },
+      {
+        "anchor": [
+          0.901,
+          0.815
+        ],
+        "h": 165,
+        "kind": "plume",
+        "src": "assets/fx/dust_plume_1.webp",
+        "w": 400,
+        "worldW": 110
+      },
+      {
+        "anchor": [
+          0.913,
+          0.884
+        ],
+        "h": 250,
+        "kind": "spray",
+        "src": "assets/fx/dust_spray_0.webp",
+        "w": 360,
+        "worldW": 64
+      },
+      {
+        "anchor": [
+          0.89,
+          0.896
+        ],
+        "h": 285,
+        "kind": "spray",
+        "src": "assets/fx/dust_spray_1.webp",
+        "w": 360,
+        "worldW": 50
+      },
+      {
+        "anchor": [
+          0.5,
+          0.821
+        ],
+        "h": 165,
+        "kind": "burst",
+        "src": "assets/fx/dust_burst_0.webp",
+        "w": 400,
+        "worldW": 150
+      },
+      {
+        "anchor": [
+          0.492,
+          0.819
+        ],
+        "h": 152,
+        "kind": "burst",
+        "src": "assets/fx/dust_burst_1.webp",
+        "w": 400,
+        "worldW": 180
+      }
+    ]
+  }
+}
