@@ -5,6 +5,7 @@
 .assetsignore
 .claude
 .wrangler
+.cloudflare
 node_modules
 wrangler.jsonc
 mise.toml
